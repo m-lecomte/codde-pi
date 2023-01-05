@@ -2,12 +2,17 @@ import 'package:codde_pi/app/dialogs/myp.dart';
 import 'package:codde_pi/core/components/file_tree.dart';
 import 'package:codde_pi/core/components/view.dart';
 import 'package:flutter/material.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:provider/provider.dart' as provider;
 
 import '../../services/editor/highlighter.dart';
 import '../../services/editor/input.dart';
 
-class EditorTab extends StatelessWidget {
+final fileTabManager = ChangeNotifierProvider<FileTabManager>((ref) {
+  return FileTabManager();
+});
+
+class EditorTab extends ConsumerWidget {
   final String title;
   final int count;
   final bool selected;
@@ -17,7 +22,7 @@ class EditorTab extends StatelessWidget {
       {this.selected = false, super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return SizedBox(
       width: 180.0,
       child: ListTile(
@@ -30,9 +35,11 @@ class EditorTab extends StatelessWidget {
         // TODO: extension <=> icon
         title: Text(title, softWrap: false),
         trailing: IconButton(
+          alignment: Alignment.center,
+          iconSize: 14.0,
           icon: const Icon(Icons.close),
           onPressed: () {
-            /*TODO*/
+            ref.read(fileTabManager.notifier).removeContent(count); // TODO: if is selectedContent, go to next/previous item
           },
         ),
       ),
@@ -61,17 +68,16 @@ class FileContent {
   FileContent(this.title, this.sjt, this.page, this.path);
 }
 
-class Editor extends StatefulWidget {
+class Editor extends ConsumerStatefulWidget {
   String path;
 
   Editor({super.key, this.path = ''});
 
   @override
-  State<StatefulWidget> createState() => _Editor();
+  ConsumerState<ConsumerStatefulWidget> createState() => _Editor();
 }
 
-class _Editor extends State<Editor> {
-  FileTabManager fileTabManager = FileTabManager();
+class _Editor extends ConsumerState<Editor> {
 
   /*var form = const MyP();
   var box = Hive.box('projects');
@@ -91,7 +97,7 @@ class _Editor extends State<Editor> {
   }
 
   void select(int count) {
-    fileTabManager.openContent(count);
+    ref.read(fileTabManager.notifier).openContent(count);
   }
 
   void createPage() {
@@ -102,19 +108,15 @@ class _Editor extends State<Editor> {
           const CddPage('/home/matt/Documents/gitlab-recovery-codes.txt',
               TabSubject.file),
           '/home/matt/Documents/gitlab-recovery-codes.txt');
-      fileTabManager.addContent(fileContent);
+      ref.read(fileTabManager.notifier).addContent(fileContent);
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    return provider.ChangeNotifierProvider(
-      create: (_) => fileTabManager,
-      // TODO: isBrut mode
-      builder: (BuildContext context, child) {
-        var contents = context.watch<FileTabManager>().contents;
-        var selected = context.watch<FileTabManager>().selectedContent;
-        return Column(
+    var contents = ref.watch<FileTabManager>(fileTabManager).contents;
+    var selected = ref.watch<FileTabManager>(fileTabManager).selectedContent;
+    return Column(
           children: [
             Container(
               height: 40.0,
@@ -148,11 +150,8 @@ class _Editor extends State<Editor> {
                 ],
               ),
             )
-          ],
-        );
-      },
-    );
-    return const MyP();
+          ],);
+    // return const MyP();
   }
 }
 
@@ -205,6 +204,11 @@ class FileTabManager extends ChangeNotifier {
 
   void insertContent(int index, FileContent content) {
     contents.insert(index, content);
+    notifyListeners();
+  }
+
+  void removeContent(int index) {
+    contents.removeAt(index);
     notifyListeners();
   }
 }

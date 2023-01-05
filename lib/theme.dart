@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_treeview/flutter_treeview.dart';
 // import 'package:flutter_html/flutter_html.dart';
 import 'package:google_fonts/google_fonts.dart';
 // import 'package:xterm/theme/terminal_theme.dart';
@@ -54,7 +55,7 @@ ThemeData cddTheme = ThemeData(
   scaffoldBackgroundColor: background,
   disabledColor: disabled,
   errorColor: error,
-  hoverColor: white,
+  hoverColor: widget,
   textTheme: TextTheme(
     bodyText1: TextStyle(color: light_grey),
     headline1: TextStyle(color: accent, fontFamily: 'Aldrich'),
@@ -63,6 +64,7 @@ ThemeData cddTheme = ThemeData(
     headline4: TextStyle(color: accent, fontFamily: 'Aldrich'),
     headline5: TextStyle(fontFamily: 'Aldrich'),
   ),
+
   floatingActionButtonTheme:
       FloatingActionButtonThemeData(backgroundColor: accent),
   cardTheme: CardTheme(
@@ -151,6 +153,31 @@ class ErrorColor extends MaterialStateColor {
     return const Color(_defaultColor);
   }
 }
+
+TreeViewTheme treeViewTheme = TreeViewTheme(
+  expanderTheme: ExpanderThemeData(
+    type: ExpanderType.caret,
+    modifier: ExpanderModifier.none,
+    position: ExpanderPosition.start,
+    color: Colors.blueAccent,
+    size: 20,
+  ),
+  labelStyle: TextStyle(
+    fontSize: 16,
+    letterSpacing: 0.3,
+  ),
+  parentLabelStyle: TextStyle(
+    fontSize: 16,
+    letterSpacing: 0.1,
+    fontWeight: FontWeight.w800,
+    color: Colors.blueAccent,
+  ),
+  iconTheme: IconThemeData(
+    size: 18,
+    color: Colors.grey.shade800,
+  ),
+  colorScheme: ColorScheme.light(),
+);
 
 /*
 class TerminalThemes {
